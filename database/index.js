@@ -24,7 +24,7 @@ import dotenv from "dotenv";
 import "mysql2";
 dotenv.config();
 
-export const sequelize = new Sequelize(
+export const db = new Sequelize(
     process.env.DB_DBNAME,
     process.env.DB_USERNAME,
     process.env.DB_PASSWORD,
@@ -36,7 +36,7 @@ export const sequelize = new Sequelize(
 )
 
 // 🔍 Cek koneksi database
-sequelize.authenticate()
+db.authenticate()
     .then(() => {
         console.log("✅ Connected to MySQL database via Sequelize");
     })
