@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/car", carRouter)
+app.use("/car", carRouter);
 
 const PORT = process.env.PORT || 5000;
 
