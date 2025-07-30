@@ -19,7 +19,7 @@ export const updateCar = async (id, data) => {
     return cars
 }
 
-export const removeCar = async (id, data) => {
+export const removeCar = async (id) => {
     const cars = await Car.findByPk(id);
     if (!cars) return null
     await cars.destroy();

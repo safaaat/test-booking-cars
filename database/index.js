@@ -35,11 +35,17 @@ export const db = new Sequelize(
     }
 )
 
-// 🔍 Cek koneksi database
+//  Cek koneksi database & Sync
 db.authenticate()
     .then(() => {
-        console.log("✅ Connected to MySQL database via Sequelize");
+        console.log("Connected to MySQL database via Sequelize");
+
+        // Sinkronisasi tabel (otomatis create jika belum ada)
+        return db.sync(); // ← ini bagian pentingnya
+    })
+    .then(() => {
+        console.log("All models were synchronized successfully.");
     })
     .catch((err) => {
-        console.error("❌ Unable to connect to the database:", err);
+        console.error("Unable to connect or sync:", err);
     });

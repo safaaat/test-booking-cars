@@ -17,13 +17,6 @@ const CarModel = db.define("car", {
         validate: {
             notEmpty: true
         }
-    },
-    url: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
     }
 }, {
     freezeTableName: true

@@ -3,9 +3,17 @@ import sharp from "sharp";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
-
-import { error } from "../../utils/Response.js";
+import { createClient } from '@supabase/supabase-js';
+import { error, success } from "../../utils/Response.js";
 import Car from "../../models/CarModel.js";
+import dotenv from "dotenv";
+import { getCarById } from "../../services/CarService.js";
+dotenv.config();
+
+const supabase = createClient(
+    process.env.PROJECT_URL,
+    process.env.ANON_KEY
+);
 
 // Atur Penyimpanan File
 const storage = multer.memoryStorage();
@@ -45,7 +53,6 @@ export const handleUploadError = (err, req, res, next) => {
 
 // Cek nama mobil dan apakah gambar
 export const checkImageAndName = async (req, res, next) => {
-    console.log()
     try {
         const { name } = req.body;
 
@@ -65,7 +72,6 @@ export const processImages = async (req, res, next) => {
     try {
         const fields = ["image1", "image2", "image3", "image4", "image5"];
         const image = [];
-        const urlImage = [];
 
         for (const field of fields) {
             const file = req.files[field]?.[0];
@@ -73,20 +79,45 @@ export const processImages = async (req, res, next) => {
 
             const uuid = crypto.randomUUID();
             const newFilename = `${uuid}.webp`;
-            const outputPath = path.resolve(`public/images/car/${newFilename}`);
 
-            await sharp(file.buffer)
-                .resize(800)
-                .webp({ quality: 80 })
-                .toFile(outputPath)
+            // Upload langsung buffer ke Supabase
+            const { error: uploadError } = await supabase.storage
+                .from('car-images')
+                .upload(newFilename, file.buffer, {
+                    contentType: file.mimetype,
+                    upsert: true,
+                });
+
+            if (uploadError) {
+                return error(res, uploadError.message, 500);
+            }
 
             image.push(newFilename);
-            urlImage.push(`images/car/${newFilename}`);
         }
 
-        req.newUrlImage = urlImage;
         req.newImage = image;
         next();
+    } catch (err) {
+        return error(res, err.message, 500);
+    }
+}
+
+export const supabaseRemoveImage = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const cars = await getCarById(id);
+        if (!cars) return error(res, "mobil tidak tersedia", 400);
+        // Pastikan cars.image dalam bentuk array (bisa dari JSON string)
+        const arrayImage = typeof cars.image === "string" ? JSON.parse(cars.image) : cars.image;
+
+        const { data, error: removeErr } = await supabase.storage
+            .from("car-images")
+            .remove([arrayImage[0]]);
+
+        if (data.length === 0) return error(res, "supabase tidak memiliki image", 400);
+
+        next()
     } catch (err) {
         return error(res, err.message, 500);
     }
