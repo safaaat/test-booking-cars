@@ -26,11 +26,29 @@ export const postImageCar = async (req, res) => {
 }
 
 export const removeImage = async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     try {
         await CarServis.removeCar(id);
         return success(res, "Mobil berhasil di hapus");
+    } catch (err) {
+        return error(res, err.message, 500);
+    }
+}
+
+export const editImage = async (req, res) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const image = JSON.stringify(req.newImage);
+
+    try {
+        if (image) {
+            await CarServis.updateCar(id, { name, image });
+        } else {
+            await CarServis.updateCar(id, { name });
+        }
+
+        return success(res, "Mobil berhasil di edit");
     } catch (err) {
         return error(res, err.message, 500);
     }

@@ -68,8 +68,27 @@ export const checkImageAndName = async (req, res, next) => {
     }
 }
 
+export const editCarsImage = async (req, res, next) => {
+    const { id } = req.params;
+    const { name } = req.body;
+    const newImage = req.files["image1"];
+
+    try {
+        const carsOld = await getCarById(id);
+
+        if (!carsOld) return error(res, "mobil tidak tersedia", 400);
+        if (carsOld.name === name && !newImage) return error(res, "Perubahan ditolak karena data mobil yang dikirim sama dengan sebelumnya", 400);
+
+        next();
+    } catch (err) {
+        return error(res, err.message, 500);
+    }
+}
+
 export const processImages = async (req, res, next) => {
     try {
+        if (!req.files["image1"]) return next();
+
         const fields = ["image1", "image2", "image3", "image4", "image5"];
         const image = [];
 
@@ -106,6 +125,8 @@ export const supabaseRemoveImage = async (req, res, next) => {
     const { id } = req.params;
 
     try {
+        if (!req.files["image1"]) return next();
+
         const cars = await getCarById(id);
         if (!cars) return error(res, "mobil tidak tersedia", 400);
         // Pastikan cars.image dalam bentuk array (bisa dari JSON string)
