@@ -1,5 +1,5 @@
 export const success = (res, message = "Success", data) => {
-    return res.status(200).json({ status: "success", message, data });
+    return res.status(200).json({ status: 200, message, data });
 }
 
 export const error = (res, message = "Error", status = 500) => {
