@@ -72,9 +72,9 @@ export const login = async (req, res) => {
         // ⬇️ Kirim sebagai HTTP-only cookie
         res.cookie("token", jwtToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 24 * 60 * 60 * 1000 // 1 hari
+            secure: true, // pastikan hanya true jika sudah pakai HTTPS
+            sameSite: "None", // <<< ini penting agar bisa cross-domain
+            maxAge: 24 * 60 * 60 * 1000,
         });
 
         return success(res, "login success", { id: users.id, status: users.status });
