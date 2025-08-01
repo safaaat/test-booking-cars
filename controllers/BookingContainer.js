@@ -1,3 +1,4 @@
+import BookingModel from "../models/BookingModel.js";
 import { createBooking, getBookingAll } from "../services/BookingService.js";
 import { getCarById } from "../services/CarService.js";
 import { error, success } from "../utils/Response.js";
@@ -19,6 +20,11 @@ export const postBooking = async (req, res) => {
         const cars = await getCarById(id);
         // Check apakah ada Car
         if (!cars) return error(res, "Booking mobil ditolak karena mobil yang anda booking tidak dapat di temukan.");
+
+        const booking = await BookingModel.findAll({ where: { name_user } });
+        // Pastikan klo 1 orang hanya bisa booking 1 mobil yang sama
+        if (!booking) return error(res, `${booking.name_user} anda sudah melakukan booking mobil`);
+
         // Check apakah name,email,dan number phone tidak boleh kosong
         if (!name_user || !email || !phone_number) return error(res, "input name, email, dan number phone tidak boleh kosong");
         // Check waktu booking tidak boleh kosong
