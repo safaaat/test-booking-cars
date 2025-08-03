@@ -29,7 +29,7 @@ export const login = async (req, res) => {
         res.cookie("token", jwtToken, {
             httpOnly: true,
             secure: process.env.COOKIE_SECURE,
-            sameSite: process.env.SAMESITE,
+            sameSite: "None",
             maxAge: 24 * 60 * 60 * 1000,
         });
 
@@ -64,7 +64,7 @@ export const logout = async (req, res) => {
         res.clearCookie("token", {
             httpOnly: true,
             secure: process.env.COOKIE_SECURE,
-            sameSite: process.env.SAMESITE,
+            sameSite: "None",
             path: "/",
             expires: new Date(0),
         });
