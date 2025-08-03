@@ -3,6 +3,8 @@ import { generateToken, verifyToken } from "../services/JwtService.js";
 import { error, success } from "../utils/Response.js";
 import UsersModel from "../models/UsersModel.js";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const login = async (req, res) => {
     const { name, email, password } = req.body;
